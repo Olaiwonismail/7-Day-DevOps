@@ -3,6 +3,7 @@ from fastapi import FastAPI , Response
 import requests
 app = FastAPI()
 @app.get("/")
+
 async def read_root():
     return {"Welcome Ismail"}
 
