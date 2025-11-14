@@ -13,19 +13,25 @@
         state: started
         enabled: yes
 
+    - name: Remove old application folder if it exists
+      file:
+        path: /opt/myapp
+        state: absent
+
     - name: Copy application folder (with Dockerfile)
       copy:
-        src: "{{ playbook_dir }}/."
+        src: "{{ playbook_dir }}/."   # copy contents of the playbook folder
         dest: /opt/myapp/
+        owner: root
+        group: root
         mode: '0755'
-
 
     - name: Build Docker image from Dockerfile
       docker_image:
         name: myappimage
         tag: latest
         build:
-          path: /opt/myapp/
+          path: /opt/myapp/          # Dockerfile is now directly here
 
     - name: Run container from built image
       docker_container:
@@ -33,4 +39,4 @@
         image: myappimage:latest
         state: started
         ports:
-          - "8080:8080"
+          - "8080:8080"               # adjust as needed
