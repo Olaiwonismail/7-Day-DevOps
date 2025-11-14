@@ -15,23 +15,23 @@
 
     - name: Copy application folder (with Dockerfile) to server
       copy:
-        src: ./7-Day-DevOps
+        src: ./
         dest: /opt/myapp/
         owner: root
         group: root
         mode: '0755'
 
-    - name: Build Docker image from Dockerfile
-      docker_image:
-        build:
-          path: /opt/myapp/
-        name: myappimage
-        tag: latest
+    # - name: Build Docker image from Dockerfile
+    #   docker_image:
+    #     build:
+    #       path: /opt/myapp/
+    #     name: myappimage
+    #     tag: latest
 
-    - name: Run container from built image
-      docker_container:
-        name: myapp
-        image: myappimage:latest
-        state: started
-        ports:
-          - "8080:8080"   # Adjust as needed for your application
+    # - name: Run container from built image
+    #   docker_container:
+    #     name: myapp
+    #     image: myappimage:latest
+    #     state: started
+    #     ports:
+    #       - "8080:8080"   # Adjust as needed for your application
