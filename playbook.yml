@@ -15,7 +15,7 @@
 
     - name: Copy application folder (with Dockerfile) to server
       copy:
-        src: ./
+        src: .
         dest: /opt/myapp/
         owner: root
         group: root
