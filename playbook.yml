@@ -15,12 +15,10 @@
 
     - name: Copy application folder (with Dockerfile)
       copy:
-        src: "{{ playbook_dir }}/"
+        src: "{{ playbook_dir }}/."
         dest: /opt/myapp/
-        owner: root
-        group: root
         mode: '0755'
-        directory_mode: '0755'
+
 
     - name: Build Docker image from Dockerfile
       docker_image:
