@@ -1,42 +1,46 @@
 - hosts: localhost
   become: yes
+  vars:
+    app_dir: /opt/myapp
+    venv_dir: /opt/myapp/venv
+    python_version: python3
   tasks:
-    - name: Install Docker
+    - name: Install Python and pip
       apt:
-        name: docker.io
+        name:
+          - python3
+          - python3-venv
+          - python3-pip
         state: present
         update_cache: yes
 
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
     - name: Remove old application folder if it exists
       file:
-        path: /opt/myapp
+        path: "{{ app_dir }}"
         state: absent
 
-    - name: Copy application folder (with Dockerfile)
+    - name: Copy application folder
       copy:
-        src: "{{ playbook_dir }}/."   # copy contents of the playbook folder
-        dest: /opt/myapp/
+        src: "{{ playbook_dir }}/."
+        dest: "{{ app_dir }}/"
         owner: root
         group: root
         mode: '0755'
 
-    - name: Build Docker image from Dockerfile
-      docker_image:
-        name: myappimage
-        tag: latest
-        build:
-          path: /opt/myapp/          # Dockerfile is now directly here
+    - name: Create virtual environment
+      command: "{{ python_version }} -m venv {{ venv_dir }}"
+      args:
+        creates: "{{ venv_dir }}/bin/activate"
 
-    - name: Run container from built image
-      docker_container:
-        name: myapp
-        image: myappimage:latest
-        state: started
-        ports:
-          - "8080:8080"               # adjust as needed
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ venv_dir }}"
+        virtualenv_command: "{{ python_version }} -m venv"
+
+    - name: Run FastAPI with Uvicorn
+      shell: |
+        source {{ venv_dir }}/bin/activate
+        uvicorn app:app --host 0.0.0.0 --port 8080
+      args:
+        chdir: "{{ app_dir }}"
