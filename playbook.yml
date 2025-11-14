@@ -13,13 +13,11 @@
         state: started
         enabled: yes
 
-    - name: Copy application folder (with Dockerfile) to server
-      copy:
-        src: .
+    - name: Copy application folder (with Dockerfile)
+      synchronize:
+        src: ./
         dest: /opt/myapp/
-        owner: root
-        group: root
-        mode: '0755'
+        recursive: yes
 
     - name: Build Docker image from Dockerfile
       docker_image:
