@@ -1,11 +1,11 @@
 - hosts: localhost
   become: yes
   vars:
-    app_dir: /opt/myapp
-    venv_dir: /opt/myapp/venv
-    python_version: python3
+    project_dir: /opt/my_new_app
+    venv_path: /opt/my_new_app/venv
+    python_exec: python3
   tasks:
-    - name: Install Python and pip
+    - name: Ensure required apt packages are installed
       apt:
         name:
           - python3
@@ -14,33 +14,34 @@
         state: present
         update_cache: yes
 
-    - name: Remove old application folder if it exists
+    - name: Ensure project directory exists
       file:
-        path: "{{ app_dir }}"
-        state: absent
-
-    - name: Copy application folder
-      copy:
-        src: "{{ playbook_dir }}/."
-        dest: "{{ app_dir }}/"
-        owner: root
-        group: root
+        path: "{{ project_dir }}"
+        state: directory
         mode: '0755'
 
+    - name: Copy all project files
+      copy:
+        src: "{{ playbook_dir }}/."
+        dest: "{{ project_dir }}/"
+        owner: root
+        group: root
+        mode: preserve
+
     - name: Create virtual environment
-      command: "{{ python_version }} -m venv {{ venv_dir }}"
+      command: "{{ python_exec }} -m venv {{ venv_path }}"
       args:
-        creates: "{{ venv_dir }}/bin/activate"
+        creates: "{{ venv_path }}/bin/activate"
 
-    - name: Install Python dependencies
+    - name: Install dependencies from requirements.txt
       pip:
-        requirements: "{{ app_dir }}/requirements.txt"
-        virtualenv: "{{ venv_dir }}"
-        virtualenv_command: "{{ python_version }} -m venv"
+        requirements: "{{ project_dir }}/requirements.txt"
+        virtualenv: "{{ venv_path }}"
+        virtualenv_command: "{{ python_exec }} -m venv"
 
-    - name: Run FastAPI with Uvicorn
+    - name: Run the FastAPI app with Uvicorn
       shell: |
-        source {{ venv_dir }}/bin/activate
+        source {{ venv_path }}/bin/activate
         uvicorn app:app --host 0.0.0.0 --port 8080
       args:
-        chdir: "{{ app_dir }}"
+        chdir: "{{ project_dir }}"
