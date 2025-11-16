@@ -27,6 +27,11 @@
         owner: root
         group: root
         mode: preserve
+    - name: Copy requirements.txt to project directory
+      copy:
+        src: requirements.txt   # Relative to the playbook file
+        dest: "{{ project_dir }}/requirements.txt"
+        
 
     - name: Create virtual environment
       command: "{{ python_exec }} -m venv {{ venv_path }}"
