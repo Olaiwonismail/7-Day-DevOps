@@ -46,7 +46,9 @@
 
     - name: Run the FastAPI app with Uvicorn
       shell: |
-        source {{ venv_path }}/bin/activate
+        . {{ venv_path }}/bin/activate
         uvicorn app:app --host 0.0.0.0 --port 8080
       args:
         chdir: "{{ project_dir }}"
+        executable: /bin/bash  # Ensures 'source' works if you prefer
+
