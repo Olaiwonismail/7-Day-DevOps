@@ -1,9 +1,13 @@
 - hosts: localhost
   become: yes
   vars:
+    project_dir: /opt/myapp
     app_dir: /opt/myapp
     venv_dir: /opt/myapp/venv
     python_version: python3
+    python_exec: python3
+    venv_path: /opt/myapp/venv
+
   tasks:
     - name: Ensure required apt packages are installed
       apt:
@@ -27,11 +31,11 @@
         owner: root
         group: root
         mode: preserve
+
     - name: Copy requirements.txt to project directory
       copy:
-        src: requirements.txt   # Relative to the playbook file
+        src: requirements.txt
         dest: "{{ project_dir }}/requirements.txt"
-        
 
     - name: Create virtual environment
       command: "{{ python_exec }} -m venv {{ venv_path }}"
@@ -40,15 +44,14 @@
 
     - name: Install Python dependencies
       pip:
-        requirements: "{{ app_dir }}/requirements.txt"
+        requirements: "{{ project_dir }}/requirements.txt"
         virtualenv: "{{ venv_dir }}"
         virtualenv_command: "{{ python_version }} -m venv"
 
-    - name: Run FastAPI with Uvicorn
+    - name: Run FastAPI with Uvicorn (background)
       shell: |
         source {{ venv_dir }}/bin/activate
-        uvicorn app:app --host 0.0.0.0 --port 8080
+        nohup uvicorn app:app --host 0.0.0.0 --port 8080 &
       args:
         chdir: "{{ project_dir }}"
-        executable: /bin/bash  # Ensures 'source' works if you prefer
-
+        executable: /bin/bash
