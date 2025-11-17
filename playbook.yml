@@ -4,6 +4,7 @@
     app_dir: /opt/myapp
     venv_dir: /opt/myapp/venv
     python_version: python3
+
   tasks:
     - name: Install Python and pip
       apt:
@@ -19,9 +20,17 @@
         path: "{{ app_dir }}"
         state: absent
 
-    - name: Copy application folder
+    - name: Recreate application folder
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy application files
       copy:
-        src: "{{ playbook_dir }}/."
+        src: "{{ playbook_dir }}/app/"
         dest: "{{ app_dir }}/"
         owner: root
         group: root
@@ -32,15 +41,13 @@
       args:
         creates: "{{ venv_dir }}/bin/activate"
 
-    - name: Install Python dependencies
+    - name: Install dependencies
       pip:
         requirements: "{{ app_dir }}/requirements.txt"
         virtualenv: "{{ venv_dir }}"
-        virtualenv_command: "{{ python_version }} -m venv"
 
-    - name: Run FastAPI with Uvicorn
+    - name: Run FastAPI (non-blocking)
       shell: |
-        source {{ venv_dir }}/bin/activate
-        uvicorn app:app --host 0.0.0.0 --port 8080
+        nohup {{ venv_dir }}/bin/uvicorn app:app --host 0.0.0.0 --port 8080 &
       args:
         chdir: "{{ app_dir }}"
