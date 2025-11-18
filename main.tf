@@ -8,7 +8,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "small_vm" {
-  name         = variable.name   
+  name         = var.name   
   machine_type = "e2-micro"                 
   zone         = "us-central1-a"            
 
