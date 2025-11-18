@@ -28,7 +28,8 @@ resource "google_compute_instance" "small_vm" {
 
   # Metadata for SSH keys
   metadata = {
-    ssh-keys = "${username}:${file("~/.ssh/id_rsa.pub")}" 
+    ssh-keys = "${var.username}:${file("~/.ssh/id_rsa.pub")}"
+
    
   }
 
