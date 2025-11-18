@@ -14,7 +14,7 @@ resource "google_compute_instance" "small_vm" {
   # Boot disk configuration
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-12-bookworm"  
+      image = "projects/debian-cloud/global/images/family/debian-12"  
       size  = 10                                 
     }
     auto_delete = true
@@ -28,7 +28,7 @@ resource "google_compute_instance" "small_vm" {
 
   # Metadata for SSH keys
   metadata = {
-    ssh-keys = "${var.username}:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "${username}:${file("~/.ssh/id_rsa.pub")}" 
    
   }
 
