@@ -1,5 +1,6 @@
 variable "project_id" {}
 variable "username" {}
+variable "name" {}
 
 provider "google" {
   project = var.project_id   
@@ -7,7 +8,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "small_vm" {
-  name         = "small-20251109-182857"   
+  name         = variable.name   
   machine_type = "e2-micro"                 
   zone         = "us-central1-a"            
 
